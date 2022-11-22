@@ -1,0 +1,5 @@
+env/
+medical-corpus/
+persuasion/
+.idea/
+__pycache__/

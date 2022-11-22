@@ -1,0 +1,7 @@
+pandas
+nltk
+sklearn
+praw
+colorama
+torch
+torchtext
