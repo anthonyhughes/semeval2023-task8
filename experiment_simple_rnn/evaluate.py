@@ -6,8 +6,10 @@ from torch.utils.data import random_split
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-labels = {2: "per_exp",
-          1: "question"}
+labels = {
+    2: "per_exp",
+    1: "question"
+}
 
 
 def predict(text, text_pipe, target_vocab):

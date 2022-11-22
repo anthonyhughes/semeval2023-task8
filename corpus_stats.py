@@ -6,11 +6,22 @@ import pandas as pd
 from corpus_utils import get_annotation_data, get_all_spans
 
 
-def matching_class(target_clazz: str, span_class: str):
+def matching_class(target_clazz: str, span_class: str) -> bool:
+    """
+    Return true where a matching class is found
+    :param target_clazz:
+    :param span_class:
+    :return: bool
+    """
     return target_clazz == span_class
 
 
 def build_stats(annotations: List) -> Dict:
+    """
+    Builder for the final stats
+    :param annotations: list of annotations to be processed
+    :return: stats
+    """
     target_class_stats = {
         'claim': 0,
         'per_exp': 0,
@@ -25,7 +36,12 @@ def build_stats(annotations: List) -> Dict:
     return target_class_stats
 
 
-def fetch_corpus_stats(file_location: str):
+def fetch_corpus_stats(file_location: str) -> None:
+    """
+    Build some stats for the target corpus
+    :param file_location:
+    :return: None
+    """
     print('Looking for file - ', file_location)
     all_entries_df = pd.read_csv(file_location)
     length = len(all_entries_df)

@@ -4,7 +4,6 @@ import torch.nn as nn
 class RNN(nn.Module):
     def __init__(self, input_dim, embedding_dim, output_dim):
         super().__init__()
-
         self.embedding = nn.EmbeddingBag(input_dim, embedding_dim, sparse=True)
         self.fc = nn.Linear(embedding_dim, output_dim)
         self.init_weights()
