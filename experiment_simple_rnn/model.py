@@ -15,6 +15,5 @@ class RNN(nn.Module):
         self.fc.bias.data.zero_()
 
     def forward(self, text, offsets):
-        # text = [sent len, batch size]
         embedded = self.embedding(text, offsets)
         return self.fc(embedded)

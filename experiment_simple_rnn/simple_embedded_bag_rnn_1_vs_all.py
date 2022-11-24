@@ -1,13 +1,20 @@
+"""
+
+Experiment 1
+
+Input -> Embedded bag -> linear
+
+Input data was question vs. ALL (all other classes as 1 claim,per claim,)
+
+"""
+
 import time
 
 import torch
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
+from datasets import yield_tokens, fit_label, generate_all_datasets
 from torchtext.vocab import build_vocab_from_iterator
 from torchtext.data.utils import get_tokenizer
-from torchtext.data.functional import to_map_style_dataset
-
-
-from datasets import RedditMedicalDataset, yield_tokens, fit_label
 from experiment_simple_rnn.model import RNN
 from experiment_simple_rnn.train import train, evaluate
 
@@ -15,8 +22,6 @@ tokenizer = get_tokenizer('basic_english')
 
 SEED = 1234
 EMBEDDING_DIM = 64
-HIDDEN_DIM = 256
-OUTPUT_DIM = 1
 EPOCHS = 10
 LR = 1
 BATCH_SIZE = 64
@@ -24,14 +29,6 @@ PATH = './embedded_bag_rnn.torch'
 
 torch.manual_seed(SEED)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-def text_pipeline(x, target_vocab):
-    return target_vocab(tokenizer(x))
-
-
-def label_pipeline(x):
-    return fit_label(x)
 
 
 def collate_batch(batch):
@@ -56,31 +53,7 @@ def build_vocab_from_dataset(train_set):
 if __name__ == '__main__':
     print('building datasets')
 
-    dataset = RedditMedicalDataset()
-
-    train_set, test_set = random_split(
-        dataset,
-        [
-            len(dataset) - 1300,
-            1300,
-        ]
-    )
-
-    train_dataset = to_map_style_dataset(train_set)
-    test_dataset = to_map_style_dataset(test_set)
-
-    print(f'Number of train samples {len(train_set)}')
-    print(f'Number of test samples {len(test_set)}')
-
-    target_vocab = build_vocab_from_dataset(train_set)
-
-    num_train = int(len(train_set) * 0.95)
-
-    split_train_set, split_valid_set = \
-        random_split(train_set, [num_train, len(train_set) - num_train])
-
-    print(f'Number of split train samples {len(split_train_set)}')
-    print(f'Number of split dev samples {len(split_valid_set)}')
+    split_train_set, split_valid_set, test_set, target_vocab = generate_all_datasets()
 
     print('Building dataloaders')
     train_dataloader = DataLoader(split_train_set,
@@ -99,10 +72,10 @@ if __name__ == '__main__':
     print('define the model')
     vocab_size = len(target_vocab)
     print('vocab size', vocab_size)
-    print('target classes', 2)
+    print('target classes', 4)
     model = RNN(input_dim=vocab_size,
                 embedding_dim=EMBEDDING_DIM,
-                output_dim=2
+                output_dim=4
                 ) \
         .to(device)
 

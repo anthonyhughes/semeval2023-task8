@@ -22,6 +22,9 @@ def generate_span_text(span, text) -> str:
     for index, char in enumerate(text):
         if index_is_within_offsets(index, start_offset=span['startOffset'], end_offset=span['endOffset']):
             filtered_annotated_text += char
+    if len(filtered_annotated_text) == 0:
+        print(span)
+        print(text)
     return filtered_annotated_text
 
 

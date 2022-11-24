@@ -3,6 +3,9 @@ import unicodedata
 import string
 import torch
 
+from datasets import fit_label
+from torchtext.data.utils import get_tokenizer
+
 all_letters = string.ascii_letters + " .,;'?"
 n_letters = len(all_letters)
 
@@ -65,6 +68,21 @@ def line_to_tensor(line):
     for li, letter in enumerate(line):
         tensor[li][0][letter_to_index(letter)] = 1
     return tensor
+
+
+def get_all_unique_classes(some_dataloader) -> int:
+    all_labels = []
+    for (label, text) in some_dataloader:
+        all_labels.append(label)
+    return set(all_labels)
+
+
+def text_pipeline(x, target_vocab, tokenizer=get_tokenizer('basic_english')):
+    return target_vocab(tokenizer(x))
+
+
+def label_pipeline(x):
+    return fit_label(x)
 
 
 if __name__ == '__main__':
