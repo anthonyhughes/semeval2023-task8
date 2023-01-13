@@ -12,7 +12,7 @@ import time
 
 import torch
 from torch.utils.data import DataLoader
-from datasets import fit_label, generate_all_datasets
+from datasets import generate_all_datasets
 from torchtext.data.utils import get_tokenizer
 from experiment_simple_rnn.model import RNN
 from experiment_simple_rnn.train import train, evaluate

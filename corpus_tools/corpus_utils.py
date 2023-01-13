@@ -46,3 +46,24 @@ def get_annotation_data(dataframe: pd.DataFrame, target_row: int) -> Dict:
         'subreddit_id': row['subreddit_id'],
         'post_id': row['post_id'],
     }
+
+
+def swap_label(label: str) -> str:
+    """
+    Force all non question labels into the per_exp category
+    :param label:
+    :return: new label
+    """
+    if label != 'question':
+        return 'per_exp'
+    else:
+        return 'question'
+
+
+def preserve_label(label: str) -> str:
+    """
+
+    :param label:
+    :return:
+    """
+    return label

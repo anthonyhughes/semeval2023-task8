@@ -17,6 +17,7 @@ from torchtext.vocab import build_vocab_from_iterator
 from torchtext.data.utils import get_tokenizer
 from experiment_simple_rnn.model import RNN
 from experiment_simple_rnn.train import train, evaluate
+from vocab import label_pipeline, text_pipeline
 
 tokenizer = get_tokenizer('basic_english')
 
@@ -104,5 +105,5 @@ if __name__ == '__main__':
     torch.save(model, PATH)
     print('Model weights saved')
     print('Checking the results of test dataset.')
-    accu_test = evaluate(test_dataloader, model, criterion)
+    accu_test = evaluate(test_dataloader, model)
     print('test accuracy {:8.3f}'.format(accu_test))

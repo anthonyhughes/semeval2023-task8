@@ -7,7 +7,6 @@ def train(dataloader, model, optimiser, criterion, epoch):
     model.train()
     total_acc, total_count = 0, 0
     log_interval = 500
-    start_time = time.time()
 
     for idx, (label, text, offsets) in enumerate(dataloader):
         optimiser.zero_grad()
@@ -19,12 +18,10 @@ def train(dataloader, model, optimiser, criterion, epoch):
         total_acc += (predicted_label.argmax(1) == label).sum().item()
         total_count += label.size(0)
         if idx % log_interval == 0 and idx > 0:
-            elapsed = time.time() - start_time
             print('| epoch {:3d} | {:5d}/{:5d} batches '
                   '| accuracy {:8.3f}'.format(epoch, idx, len(dataloader),
                                               total_acc / total_count))
             total_acc, total_count = 0, 0
-            start_time = time.time()
 
 
 def evaluate(dataloader, model):

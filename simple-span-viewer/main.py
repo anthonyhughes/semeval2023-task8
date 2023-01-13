@@ -5,7 +5,7 @@ from colorama import Style
 from consts import COLOUR_MAPPING, SUBREDDIT_ID_TO_POPULATION
 import pandas as pd
 
-from corpus_utils import get_annotation_data, get_all_spans, get_span_for_index
+from corpus_tools.corpus_utils import get_annotation_data, get_all_spans, get_span_for_index
 
 
 def visualise_text_with_spans(post_id: str, category: str, text: str, spans: List) -> None:
