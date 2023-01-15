@@ -1,10 +1,15 @@
 from colorama import Back
 
 COLOUR_MAPPING = {
+    # for claims
     'claim': Back.RED,
     'per_exp': Back.BLUE,
     'claim_per_exp': Back.WHITE,
-    'question': Back.GREEN
+    'question': Back.GREEN,
+    # for PICO
+    'population': Back.RED,
+    'intervention': Back.BLUE,
+    'outcome': Back.WHITE
 }
 
 SUBREDDIT_ID_TO_POPULATION = {

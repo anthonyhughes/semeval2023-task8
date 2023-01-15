@@ -26,7 +26,10 @@ def build_stats(annotations: List) -> Dict:
         'claim': 0,
         'per_exp': 0,
         'claim_per_exp': 0,
-        'question': 0
+        'question': 0,
+        'population': 0,
+        'intervention': 0,
+        'outcome': 0,
     }
 
     for key in list(target_class_stats.keys()):
@@ -51,7 +54,10 @@ def fetch_corpus_stats(file_location: str) -> None:
 
     all_annotations = []
     for i in range(0, length):
-        corpus_entry = get_annotation_data(dataframe=all_entries_df, target_row=i)
+        if 'st1' in file_location:
+            corpus_entry = get_annotation_data(dataframe=all_entries_df, target_row=i)
+        else:
+            corpus_entry = get_annotation_data(dataframe=all_entries_df, target_row=i, target_col='stage2_labels')
         corpus_entry_annotations = get_all_spans(corpus_entry['annotation_spans'])
         all_annotations.extend(corpus_entry_annotations)
 
@@ -74,7 +80,8 @@ if __name__ == '__main__':
     parser.add_argument("--file_location",
                         type=str,
                         help="CSV location with List of reddit post and their annotations",
-                        default='./medical-corpus/st1/st1_train_inc_text_.csv'
+                        # default='./medical-corpus/st1/st1_train_inc_text_.csv'
+                        default='./medical-corpus/st2/st2_train_inc_text_.csv'
                         )
     args = parser.parse_args()
 

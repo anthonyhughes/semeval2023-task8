@@ -28,6 +28,26 @@ def generate_span_text(span, text) -> str:
     return filtered_annotated_text
 
 
+def generate_word_tokens_spans(text: str) -> List:
+    token_spans = []
+    start_of_word = True
+    current_word = ''
+    current_start_span = 0
+    text = text.replace("\n", " ")
+    for index, char in enumerate(text):
+        if start_of_word is True:
+            current_word = ''
+            start_of_word = False
+            current_word += char
+            current_start_span = index
+        elif char == ' ':
+            start_of_word = True
+            token_spans.append((current_word, current_start_span, index - 1))
+        else:
+            current_word += char
+    return token_spans
+
+
 def get_all_spans(annotation_spans: str) -> List[Dict]:
     """
     Get all annotation labels from a row from within the original corpus
@@ -38,10 +58,10 @@ def get_all_spans(annotation_spans: str) -> List[Dict]:
     return data[0]['crowd-entity-annotation']['entities']
 
 
-def get_annotation_data(dataframe: pd.DataFrame, target_row: int) -> Dict:
+def get_annotation_data(dataframe: pd.DataFrame, target_row: int, target_col: str = 'stage1_labels') -> Dict:
     row = dataframe.iloc[target_row]
     return {
-        'annotation_spans': row['stage1_labels'],
+        'annotation_spans': row[target_col],
         'text': row['text'],
         'subreddit_id': row['subreddit_id'],
         'post_id': row['post_id'],

@@ -26,16 +26,17 @@ def visualise_text_with_spans(post_id: str, category: str, text: str, spans: Lis
     print('\n#########')
 
 
-def run_viewer(file_location: str, target_row: int) -> None:
+def run_viewer(file_location: str, target_row: int, target_col: str = 'stage1_labels') -> None:
     """
     Main function for running the annotation viewer
+    :param target_col:
     :param target_row:
     :param file_location: location of text and annotations
     :return:
     """
     all_entries_df = pd.read_csv(file_location)
     # print('Example row', all_entries_df.iloc[0])
-    for_viewing = get_annotation_data(dataframe=all_entries_df, target_row=target_row)
+    for_viewing = get_annotation_data(dataframe=all_entries_df, target_row=target_row, target_col=target_col)
     # print('Annotations in row', for_viewing['annotation_spans'])
     all_spans_for_viewing = get_all_spans(for_viewing['annotation_spans'])
     # print('All spans in text', all_spans_for_viewing)
@@ -62,4 +63,4 @@ if __name__ == '__main__':
                         )
     args = parser.parse_args()
 
-    run_viewer(file_location=args.file_location, target_row=args.target_row)
+    run_viewer(file_location=args.file_location, target_row=args.target_row, target_col='stage2_labels')
