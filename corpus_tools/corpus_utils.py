@@ -1,6 +1,22 @@
 import json
+import re
+import string
 from typing import List, Dict
+
+import nltk
 import pandas as pd
+
+
+def clean_token(token: str) -> str:
+    """
+    Clean up tokens
+    :param token:
+    :return:
+    """
+    token = token.strip()
+    token = token.lower()
+    token = token.translate(str.maketrans(' ', ' ', string.punctuation))
+    return token
 
 
 def index_is_within_offsets(index: int, start_offset: int, end_offset: int) -> bool:
@@ -28,12 +44,20 @@ def generate_span_text(span, text) -> str:
     return filtered_annotated_text
 
 
+def lookup_pos_tag(all_pos_tags, current_word):
+    results = [pos_tag for word, pos_tag in all_pos_tags if word == current_word]
+    return results[0]
+
+
 def generate_word_tokens_spans(text: str) -> List:
     token_spans = []
     start_of_word = True
     current_word = ''
     current_start_span = 0
-    text = text.replace("\n", " ")
+    words = re.split(r" |\n", text)
+    words = [clean_token(word) for word in words]
+    text = " ".join(words)
+    all_pos_tags = nltk.pos_tag(words)
     for index, char in enumerate(text):
         if start_of_word is True:
             current_word = ''
@@ -42,7 +66,13 @@ def generate_word_tokens_spans(text: str) -> List:
             current_start_span = index
         elif char == ' ':
             start_of_word = True
-            token_spans.append((current_word, current_start_span, index - 1))
+            cleaned_word = clean_token(current_word)
+            token_spans.append(
+                (cleaned_word,
+                 current_start_span,
+                 index - 1,
+                 lookup_pos_tag(all_pos_tags, cleaned_word))
+            )
         else:
             current_word += char
     return token_spans

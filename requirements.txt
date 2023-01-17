@@ -5,3 +5,4 @@ praw
 colorama
 torch
 torchtext
+python-crfsuite

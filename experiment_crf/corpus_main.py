@@ -5,19 +5,6 @@ from corpus_tools.corpus_utils import get_all_spans, generate_word_tokens_spans,
     get_span_for_index
 import pandas as pd
 
-
-def clean_token(token: str) -> str:
-    """
-    Clean up tokens
-    :param token:
-    :return:
-    """
-    token = token.strip()
-    token = token.lower()
-    token = token.translate(str.maketrans('', '', string.punctuation))
-    return token
-
-
 def is_bad_token(token: str) -> bool:
     return token == "" or token.startswith("http")
 
@@ -43,17 +30,16 @@ def create_token_classification_corpus_as_csv(file_location: str,
         word_token_spans = [([], generate_word_tokens_spans(text)) for text in all_entries_df['text']]
     final_corpus = []
     for labels, row in word_token_spans:
-        for token, start, end in row:
+        for token, start, end, pos_tag in row:
             median_value = statistics.median([start, end])
             available_spans = get_span_for_index(median_value, labels)
-            token = clean_token(token)
             if is_bad_token(token):
                 continue
             if len(available_spans) >= 1:
-                final_corpus.append((token, available_spans[0]['label']))
+                final_corpus.append((token, available_spans[0]['label'], pos_tag))
             else:
-                final_corpus.append((token, 'none'))
-    final_frame = pd.DataFrame(final_corpus, columns=['token', 'label'])
+                final_corpus.append((token, 'none', pos_tag))
+    final_frame = pd.DataFrame(final_corpus, columns=['token', 'label', 'pos_tag'])
     final_frame.to_csv(path_or_buf=output_location, index=False)
 
 
