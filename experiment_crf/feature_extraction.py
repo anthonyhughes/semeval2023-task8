@@ -1,3 +1,4 @@
+import math
 from typing import Callable, List
 import pandas as pd
 
@@ -35,14 +36,26 @@ def doc_to_features(pd_frame: pd.DataFrame) -> list:
     all_features = []
 
     for (i, row) in pd_frame.iterrows():
-        word = row['token']
+        original_word = row['token']
+        word = row['clean_token']
         pos_tag = row['pos_tag']
+        start_of_doc, end_of_doc = row['start_of_doc'], row['end_of_doc']
+        isalnum, isupper, isnumeric, istitle = row['isalnum'], row['isupper'], row['isnumeric'], row['istitle']
 
         features = [
             'bias',
             'word=' + word,
-            'pos_tag=' + pos_tag
+            'pos_tag=' + pos_tag,
+            'word.isalnum=%s' % isalnum,
+            'word.isupper=%s' % isupper,
+            'word.isnumeric=%s' % isnumeric,
+            'word.istitle=%s' % istitle,
         ]
+
+        if start_of_doc is True:
+            features.append(START_OF_DOC)
+        if end_of_doc is True:
+            features.append(END_OF_DOC)
 
         # gets previous entries
         if i > 0:
@@ -50,13 +63,23 @@ def doc_to_features(pd_frame: pd.DataFrame) -> list:
                 '-1:word=' + pd_frame.iloc[i - 1]['token'],
                 '-1:pos_tag=' + pd_frame.iloc[i - 1]['pos_tag']
             ])
-        else:
-            features.append(START_OF_DOC)
 
         if i > 1:
             features.extend([
                 '-2:word=' + pd_frame.iloc[i - 2]['token'],
                 '-2:pos_tag=' + pd_frame.iloc[i - 2]['pos_tag']
+            ])
+
+        if i > 2:
+            features.extend([
+                '-3:word=' + pd_frame.iloc[i - 3]['token'],
+                '-3:pos_tag=' + pd_frame.iloc[i - 3]['pos_tag']
+            ])
+
+        if i > 3:
+            features.extend([
+                '-4:word=' + pd_frame.iloc[i - 4]['token'],
+                '-4:pos_tag=' + pd_frame.iloc[i - 4]['pos_tag']
             ])
 
         # get next articles
@@ -65,13 +88,23 @@ def doc_to_features(pd_frame: pd.DataFrame) -> list:
                 '+1:word=' + pd_frame.iloc[i + 1]['token'],
                 '+1:pos_tag=' + pd_frame.iloc[i + 2]['pos_tag']
             ])
-        else:
-            features.append(END_OF_DOC)
 
         if i < len(pd_frame) - 3:
             features.extend([
                 '+2:word=' + pd_frame.iloc[i + 2]['token'],
                 '+2:pos_tag=' + pd_frame.iloc[i + 2]['pos_tag']
+            ])
+
+        if i < len(pd_frame) - 4:
+            features.extend([
+                '+3:word=' + pd_frame.iloc[i + 3]['token'],
+                '+3:pos_tag=' + pd_frame.iloc[i + 3]['pos_tag']
+            ])
+
+        if i < len(pd_frame) - 5:
+            features.extend([
+                '+4:word=' + pd_frame.iloc[i + 4]['token'],
+                '+4:pos_tag=' + pd_frame.iloc[i + 4]['pos_tag']
             ])
 
         all_features.append(features)

@@ -47,16 +47,16 @@ def infer(model: pycrfsuite.Tagger,
     input_df = pd.read_csv(input_file)
     all_predictions = infer_picos(input_df, model)
 
-    output_df = pd.DataFrame(columns=['token', 'predicted_label'])
+    output_df = pd.DataFrame(columns=['subreddit_id', 'post_id', 'words', 'labels'])
     output_df = pd.concat(
         [
             output_df,
             pd.DataFrame((
-                {'token': all_predictions[0], 'predicted_label': all_predictions[1]}
+                {'subreddit_id': input_df['subreddit_id'], 'post_id': input_df['post_id'], 'words': all_predictions[0], 'labels': all_predictions[1]}
             ))
         ]
     )
-    output_df.to_csv(output_file)
+    output_df.to_csv(output_file, index=False)
 
     print('Inference Completed')
 
