@@ -6,9 +6,10 @@ from constants import START_OF_DOC, END_OF_DOC
 
 
 # ====================
-def doc_to_classes(pd_frame: pd.DataFrame) -> List:
+def doc_to_classes(pd_frame: pd.DataFrame, task: str) -> List:
     """
     Extract labels from dataframe
+    :param task:
     :param pd_frame:
     :return: list of target classes/labels
     """
@@ -37,7 +38,7 @@ def doc_to_features(pd_frame: pd.DataFrame) -> list:
 
     for (i, row) in pd_frame.iterrows():
         original_word = row['token']
-        word = row['clean_token']
+        word = row['clean_token'] if not isinstance(row['clean_token'], float) else 'Nan'
         pos_tag = row['pos_tag']
         start_of_doc, end_of_doc = row['start_of_doc'], row['end_of_doc']
         isalnum, isupper, isnumeric, istitle = row['isalnum'], row['isupper'], row['isnumeric'], row['istitle']
@@ -82,11 +83,17 @@ def doc_to_features(pd_frame: pd.DataFrame) -> list:
                 '-4:pos_tag=' + pd_frame.iloc[i - 4]['pos_tag']
             ])
 
+        if i > 4:
+            features.extend([
+                '-5:word=' + pd_frame.iloc[i - 5]['token'],
+                '-5:pos_tag=' + pd_frame.iloc[i - 5]['pos_tag']
+            ])
+
         # get next articles
         if i < len(pd_frame) - 2:
             features.extend([
                 '+1:word=' + pd_frame.iloc[i + 1]['token'],
-                '+1:pos_tag=' + pd_frame.iloc[i + 2]['pos_tag']
+                '+1:pos_tag=' + pd_frame.iloc[i + 1]['pos_tag']
             ])
 
         if i < len(pd_frame) - 3:
@@ -105,6 +112,12 @@ def doc_to_features(pd_frame: pd.DataFrame) -> list:
             features.extend([
                 '+4:word=' + pd_frame.iloc[i + 4]['token'],
                 '+4:pos_tag=' + pd_frame.iloc[i + 4]['pos_tag']
+            ])
+
+        if i < len(pd_frame) - 6:
+            features.extend([
+                '+5:word=' + pd_frame.iloc[i + 5]['token'],
+                '+5:pos_tag=' + pd_frame.iloc[i + 5]['pos_tag']
             ])
 
         all_features.append(features)

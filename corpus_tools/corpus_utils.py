@@ -8,6 +8,9 @@ import nltk
 from nltk.corpus import stopwords
 import pandas as pd
 
+from consts import TARGET_CLASSES, PICO_MAP
+
+
 # nltk.download('stopwords')
 
 
@@ -71,24 +74,49 @@ def lookup_pos_tag(all_pos_tags, current_word):
         return 'O'
 
 
-def generate_corpus(word_token_spans: List) -> List:
+def generate_corpus(word_token_spans: List, task: str = 'b') -> List:
+    """
+    Generate token by token corpus from the word/label spans extracted from the RedHOT corpora
+    :param word_token_spans:
+    :param task:
+    :return: final list of tokens with annotated labels
+    """
     final_corpus = []
+    last_end_offset = 0
+    last_start_offset = 0
+    span_count = 0
     for labels, row, subreddit_id, post_id in word_token_spans:
-        for token, clean_token, start, end, pos_tag, isalnum, isupper, isnumeric, istitle, start_of_doc, end_of_doc in row:
+        for token, clean_token, start, end, pos_tag, isalnum, isupper, isnumeric, istitle, has_question_mark, \
+            start_of_doc, end_of_doc in \
+                row:
             median_value = statistics.median([start, end])
             available_spans = get_span_for_index(median_value, labels)
-
             if len(available_spans) >= 1:
+                start_offset, end_offset = available_spans[0]['startOffset'], available_spans[0]['endOffset']
+
+                if last_start_offset != start_offset and last_end_offset != end_offset:
+                    span_count = 0
+
+                if span_count == 0:
+                    last_start_offset, last_end_offset = start_offset, end_offset
+                    prefix = 'B'
+
+                if span_count >= 1:
+                    prefix = 'I'
+
+                span_count += 1
+
                 final_corpus.append(
                     (
                         token,
                         clean_token,
-                        lookup_class_label(available_spans[0]['label']),
+                        lookup_class_label(available_spans[0]['label'], task, prefix),
                         pos_tag,
                         subreddit_id,
                         post_id,
-                        isalnum, isupper, isnumeric, istitle, start_of_doc, end_of_doc)
+                        isalnum, isupper, isnumeric, istitle, has_question_mark, start_of_doc, end_of_doc)
                 )
+
             else:
                 final_corpus.append(
                     (token,
@@ -97,7 +125,7 @@ def generate_corpus(word_token_spans: List) -> List:
                      pos_tag,
                      subreddit_id,
                      post_id,
-                     isalnum, isupper, isnumeric, istitle, start_of_doc, end_of_doc)
+                     isalnum, isupper, isnumeric, istitle, has_question_mark, start_of_doc, end_of_doc)
                 )
     return final_corpus
 
@@ -174,6 +202,7 @@ def generate_word_tokens_spans(text: str) -> List:
                     current_word.isupper(),
                     current_word.isnumeric(),
                     current_word.istitle(),
+                    '?' in current_word,
                     start_of_doc,
                     True if index == len(text) - 1 else False
                 )
@@ -225,16 +254,22 @@ def preserve_label(label: str) -> str:
     return label
 
 
-def lookup_class_label(label: str) -> str:
+def lookup_class_label(label: str, task: str = 'b', prefix: str = 'I') -> str:
     """
-    :param label:
+    Handle PICO labels appropriately for competition submission
+
+    :param prefix:
+    :param label: to be altered
+    :param task: different tasks require different labels generated
     :return:
     """
-    if label == 'population':
-        return 'POP'
-    elif label == 'intervention':
-        return 'INT'
-    elif label == 'outcome':
-        return 'OUT'
+
+    if task == 'a' and label in TARGET_CLASSES:
+        return f'{label}'
+    elif task == 'a':
+        return 'O'
+
+    if task == 'b' and label in PICO_MAP:
+        return PICO_MAP[label]
     else:
         return 'O'

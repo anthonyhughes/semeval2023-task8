@@ -62,5 +62,7 @@ def infer(model: pycrfsuite.Tagger,
 
 
 if __name__ == '__main__':
+    print('Starting')
     model = read_trained_model(args.trained_model_path)
     infer(model, args.input_file, args.output_file)
+    print('Done')

@@ -13,9 +13,10 @@ args = parse_train_arguments()
 
 
 # ====================
-def select_x_y_features(data: pd.DataFrame) -> Tuple[List, List]:
+def select_x_y_features(data: pd.DataFrame, task: str = 'b') -> Tuple[List, List]:
     """
     Select the x and y features from a dataframe
+    :param task:
     :param data:
     :return:
     """
@@ -24,7 +25,7 @@ def select_x_y_features(data: pd.DataFrame) -> Tuple[List, List]:
 
     # Generate features/tags
     X_train = doc_to_features(data)
-    y_train = doc_to_classes(data)
+    y_train = doc_to_classes(data, task)
     return X_train, y_train
 
 
@@ -65,8 +66,9 @@ def train(training_data_location, trained_model_path) -> None:
     """
     print('Beginning train')
 
+    task = 'a'
     data = read_train_data(training_data_location)
-    x, y = select_x_y_features(data)
+    x, y = select_x_y_features(data, task)
 
     print('Building trainer')
     trainer = pycrfsuite.Trainer(verbose=False)

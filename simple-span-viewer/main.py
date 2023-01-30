@@ -63,4 +63,5 @@ if __name__ == '__main__':
                         )
     args = parser.parse_args()
 
-    run_viewer(file_location=args.file_location, target_row=args.target_row, target_col='stage2_labels')
+    run_viewer(file_location=args.file_location, target_row=args.target_row,
+               target_col='stage1_labels')
